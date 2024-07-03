@@ -1,6 +1,6 @@
 {
     "name": "lacodix/laravel-plans",
-    "description": "A Laravel package manage plans and subscriptions and track billing in your laravel SAAS.",
+    "description": "A Laravel package to manage plans and subscriptions and track billing in your laravel SAAS.",
     "type": "laravel-package",
     "keywords": [
         "lacodix",
@@ -35,7 +35,7 @@
         "illuminate/support": "^10.0|^11.0",
         "larastan/larastan": "^2.9",
         "laravel/pint": "^1.0",
-        "nunomaduro/collision": "^8.0",
+        "nunomaduro/collision": "^7.0|^8.0",
         "nunomaduro/phpinsights": "^2.6",
         "orchestra/testbench": "^9.0",
         "pestphp/pest": "^2.21",
