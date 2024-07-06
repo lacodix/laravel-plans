@@ -24,7 +24,7 @@ it('does not renew still running subscriptions', function () {
 
     $this->sub->renew();
 
-    expect($this->sub->refresh())->ends_at->toBeCarbon('2020-01-31 23:59:59');
+    expect($this->sub->refresh())->period_ends_at->toBeCarbon('2020-01-31 23:59:59');
 });
 
 it('can force renewing running subscriptions', function () {
@@ -32,7 +32,7 @@ it('can force renewing running subscriptions', function () {
 
     $this->sub->renew(true);
 
-    expect($this->sub->refresh())->ends_at->toBeCarbon('2020-02-29 23:59:59');
+    expect($this->sub->refresh())->period_ends_at->toBeCarbon('2020-02-29 23:59:59');
 });
 
 it('renews ended subscriptions', function () {
@@ -40,7 +40,7 @@ it('renews ended subscriptions', function () {
 
     $this->sub->renew();
 
-    expect($this->sub->refresh())->ends_at->toBeCarbon('2020-02-29 23:59:59');
+    expect($this->sub->refresh())->period_ends_at->toBeCarbon('2020-02-29 23:59:59');
 });
 
 it('renews and uncancels canceled subscriptions', function () {
@@ -55,7 +55,7 @@ it('renews and uncancels canceled subscriptions', function () {
     $this->sub->renew(true);
 
     expect($this->sub->refresh())
-        ->ends_at->toBeCarbon('2020-02-29 23:59:59')
+        ->period_ends_at->toBeCarbon('2020-02-29 23:59:59')
         ->canceled_at->toBeNull()
         ->canceled_for->toBeNull();
 });

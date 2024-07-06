@@ -29,7 +29,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         ]);
 
         foreach (scandir(__DIR__ .'/../database/migrations') as $filename) {
-            if (Str::endsWith($filename, '.php')) {
+            if (Str::endsWith($filename, '.php.stub')) {
                 $migration = include __DIR__ .'/../database/migrations/' . $filename;
                 $migration->up();
             }

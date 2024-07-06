@@ -2,6 +2,7 @@
 
 use Lacodix\LaravelPlans\Models\Plan;
 use function Spatie\PestPluginTestTime\testTime;
+
 use Tests\Models\User;
 
 beforeEach(function () {
@@ -26,8 +27,9 @@ it('can subscribe to plan', function () {
         'subscriber_id' => $this->user->id,
         'subscriber_type' => User::class,
         'slug' => 'default',
-        'starts_at' => '2020-01-01 00:00:00',
-        'ends_at' => '2020-01-31 23:59:59',
+        'started_at' => '2020-01-01 00:00:00',
+        'period_starts_at' => '2020-01-01 00:00:00',
+        'period_ends_at' => '2020-01-31 23:59:59',
         'trial_ends_at' => null,
         'canceled_at' => null,
         'canceled_for' => null,
@@ -52,8 +54,9 @@ test('subscription gets trial period', function () {
         'subscriber_id' => $this->user->id,
         'subscriber_type' => User::class,
         'slug' => 'default',
-        'starts_at' => '2020-01-31 00:00:00',
-        'ends_at' => '2020-04-29 23:59:59',
+        'started_at' => '2020-01-31 00:00:00',
+        'period_starts_at' => '2020-01-31 00:00:00',
+        'period_ends_at' => '2020-04-29 23:59:59',
         'trial_ends_at' => '2020-02-29 23:59:59',
         'canceled_at' => null,
         'canceled_for' => null,
@@ -112,8 +115,9 @@ it('cannot subscribe same slug twice', function () {
         'subscriber_id' => $this->user->id,
         'subscriber_type' => User::class,
         'slug' => 'default',
-        'starts_at' => '2020-01-01 00:00:00',
-        'ends_at' => '2020-01-31 23:59:59',
+        'started_at' => '2020-01-01 00:00:00',
+        'period_starts_at' => '2020-01-01 00:00:00',
+        'period_ends_at' => '2020-01-31 23:59:59',
         'trial_ends_at' => null,
         'canceled_at' => null,
         'canceled_for' => null,
@@ -153,8 +157,9 @@ it('can change plan with same slug', function () {
         'subscriber_id' => $this->user->id,
         'subscriber_type' => User::class,
         'slug' => 'default',
-        'starts_at' => '2020-01-15 00:00:00',
-        'ends_at' => '2020-02-14 23:59:59',
+        'started_at' => '2020-01-15 00:00:00',
+        'period_starts_at' => '2020-01-15 00:00:00',
+        'period_ends_at' => '2020-02-14 23:59:59',
         'trial_ends_at' => '2020-02-01 23:59:59',
         'canceled_at' => null,
         'canceled_for' => null,

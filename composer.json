@@ -1,6 +1,6 @@
 {
     "name": "lacodix/laravel-plans",
-    "description": "A Laravel package to manage plans and subscriptions and track billing in your laravel SAAS.",
+    "description": "A Laravel package to manage plans and subscriptions and track billing in your Laravel SAAS.",
     "type": "laravel-package",
     "keywords": [
         "lacodix",
