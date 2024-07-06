@@ -17,11 +17,13 @@ return new class() extends Migration {
             $table->foreignIdFor(config('plans.models.plan'))->constrained();
             $table->morphs('subscriber');
             $table->string('slug'); // only unique per subscriber
-            $table->dateTime('starts_at')->nullable();
+            $table->dateTime('started_at')->nullable();
             $table->dateTime('trial_ends_at')->nullable();
-            $table->dateTime('ends_at')->nullable();
+            $table->dateTime('period_starts_at')->nullable();
+            $table->dateTime('period_ends_at')->nullable();
             $table->dateTime('canceled_for')->nullable();
             $table->dateTime('canceled_at')->nullable();
+            $table->dateTime('billed_until')->nullable();
 
             $table->timestamps();
             $table->softDeletes();

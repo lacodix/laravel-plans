@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\DB;
 use Lacodix\LaravelPlans\Classes\Period;
 use Lacodix\LaravelPlans\Contracts\Subscriber;
 use Lacodix\LaravelPlans\Enums\Interval;
+use Lacodix\LaravelPlans\Events\SubscriptionRenewed;
 use Lacodix\LaravelPlans\Models\Traits\ConsumesFeatures;
 use LogicException;
 
@@ -21,9 +22,10 @@ use LogicException;
  * @property int $plan_id
  * @property Subscriber $subscriber
  * @property string $slug
- * @property ?Carbon $starts_at
+ * @property ?Carbon $started_at
  * @property ?Carbon $trial_ends_at
- * @property ?Carbon $ends_at
+ * @property ?Carbon $period_starts_at
+ * @property ?Carbon $period_ends_at
  * @property ?Carbon $canceled_for
  * @property ?Carbon $canceled_at
  * @property Plan $plan
@@ -38,19 +40,23 @@ class Subscription extends Model
         'subscriber_id',
         'subscriber_type',
         'slug',
-        'starts_at',
+        'started_at',
         'trial_ends_at',
-        'ends_at',
+        'period_starts_at',
+        'period_ends_at',
         'canceled_for',
         'canceled_at',
+        'billed_until',
     ];
 
     protected $casts = [
-        'starts_at' => 'datetime',
+        'started_at' => 'datetime',
         'trial_ends_at' => 'datetime',
-        'ends_at' => 'datetime',
+        'period_starts_at' => 'datetime',
+        'period_ends_at' => 'datetime',
         'canceled_for' => 'datetime',
         'canceled_at' => 'datetime',
+        'billed_until' => 'datetime',
     ];
 
     public function getTable(): string
@@ -120,12 +126,12 @@ class Subscription extends Model
     {
         $date ??= now();
 
-        return $this->ends_at && $date->gte($this->ends_at);
+        return $this->period_ends_at && $date->gte($this->period_ends_at);
     }
 
     public function cancel(?Carbon $date = null): void
     {
-        $this->canceled_for = $date ?? now();
+        $this->canceled_for = $date ?? $this->period_ends_at;
         $this->canceled_at = now();
         $this->save();
     }
@@ -152,12 +158,14 @@ class Subscription extends Model
         $this->usages()->delete();
 
         // renew to next period
-        $this->setNewPeriod(start: $this->ends_at->clone()->addSecond());
+        $this->setNewPeriod(start: $this->period_ends_at->clone()->addSecond());
         $this->canceled_at = null; // might be canceled, but now, renewed.
         $this->canceled_for = null;
         $this->save();
 
         DB::commit();
+
+        SubscriptionRenewed::dispatch($this);
 
         return $this;
     }
@@ -210,7 +218,7 @@ class Subscription extends Model
      */
     public function scopeEnding(Builder $builder, int $dayRange = 3): Builder
     {
-        return $builder->whereBetween('ends_at', [now(), now()->addDays($dayRange)]);
+        return $builder->whereBetween('period_ends_at', [now(), now()->addDays($dayRange)]);
     }
 
     /**
@@ -220,7 +228,7 @@ class Subscription extends Model
      */
     public function scopeEnded(Builder $builder): Builder
     {
-        return $builder->where('ends_at', '<=', now());
+        return $builder->where('period_ends_at', '<=', now());
     }
 
     /**
@@ -230,7 +238,32 @@ class Subscription extends Model
      */
     public function scopeActive(Builder $builder): Builder
     {
-        return $builder->where('ends_at', '>', now());
+        return $builder->where('period_ends_at', '>', now());
+    }
+
+    /**
+     * @param Builder<Subscription> $builder
+     *
+     * @return Builder<Subscription>
+     */
+    public function scopeUncanceled(Builder $builder): Builder
+    {
+        return $builder->whereNull('canceled_at');
+    }
+
+    public function calculatePeriodPrice(): float
+    {
+        $period = new Period(
+            interval: $this->plan->billing_interval,
+            count: $this->plan->billing_period,
+            start: $this->period_starts_at,
+            synced: config('plans.sync_subscriptions'),
+        );
+
+        return round(
+            $this->plan->price * $period->getLengthInPercent($this->trial_ends_at) / 100,
+            config('plans.price_precision', 2)
+        );
     }
 
     /**
@@ -252,8 +285,8 @@ class Subscription extends Model
             synced: config('plans.sync_subscriptions'),
         );
 
-        $this->starts_at = $period->getStartDate();
-        $this->ends_at = $period->getEndDate();
+        $this->period_starts_at = $period->getStartDate();
+        $this->period_ends_at = $period->getEndDate();
 
         return $this;
     }
@@ -261,9 +294,11 @@ class Subscription extends Model
     protected static function booted(): void
     {
         static::creating(static function (self $subscription): void {
-            if (! $subscription->starts_at || ! $subscription->ends_at) {
+            if (! $subscription->period_starts_at || ! $subscription->period_ends_at) {
                 $subscription->setNewPeriod();
             }
+
+            $subscription->started_at = $subscription->period_starts_at; // keep first period-start forever
         });
 
         static::deleted(static function (self $subscription): void {

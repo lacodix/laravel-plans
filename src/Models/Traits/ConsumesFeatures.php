@@ -90,7 +90,7 @@ trait ConsumesFeatures
 
         if ($feature->pivot->resettable_period) {
             // if not already set, find current valid_until date
-            $usage->valid_until ??= $this->calculateResetDate($feature->pivot, $this->starts_at);
+            $usage->valid_until ??= $this->calculateResetDate($feature->pivot, $this->period_starts_at);
 
             while ($usage->expired()) {
                 $usage->valid_until = $this->calculateResetDate($feature->pivot, $usage->valid_until->clone()->addSecond());

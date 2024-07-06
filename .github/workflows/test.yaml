@@ -12,13 +12,11 @@ jobs:
       fail-fast: true
       matrix:
         php: [8.2, 8.3]
-        laravel: [10.*, 11.*]
+        laravel: [11.*]
         dependency-version: [prefer-lowest, prefer-stable]
         include:
           - laravel: 11.*
             testbench: 9.*
-          - laravel: 10.*
-            testbench: 8.*
         composer-version: [ v2 ]
     name: ${{ matrix.php }} - Composer ${{ matrix.composer-version }} --${{ matrix.dependency-version }}
 

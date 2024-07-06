@@ -59,6 +59,30 @@ enum Interval: string
         };
     }
 
+    public function getSyncedPeriodStart(Carbon $start): Carbon
+    {
+        // If we sync the subscriptions, we have to care about the current interval and calculate different endings
+        // @phpstan-ignore-next-line - PHPStan sees CarbonInterface here, but it isn't
+        return match ($this) {
+            Interval::DAY => $start->clone()
+                ->startOfDay(),
+            Interval::WEEK => $start->clone()
+                ->startOfWeek(),
+            Interval::MONTH => $start->clone()
+                ->startOfMonth(),
+            Interval::TWO_MONTHS => $start->clone()
+                ->startOfMonth()
+                ->sub('month', $start->month % 2 === 0 ? 1 : 0),
+            Interval::QUARTER => $start->clone()
+                ->startOfQuarter(),
+            Interval::HALF_YEAR => $start->clone()
+                ->startOfMonth()
+                ->sub('month', $start->month - ($start->month > 6 ? 6 : 0) - 1),
+            Interval::YEAR => $start->clone()
+                ->startOfYear(),
+        };
+    }
+
     private function calculateMonthsToAddForTwoMonths(Carbon $start, int $count): int
     {
         // it is always count-1 * 2, and then finally "endOfTwoMonths"
