@@ -16,11 +16,15 @@ use Lacodix\LaravelPlans\Contracts\Subscriber;
 use Lacodix\LaravelPlans\Enums\Interval;
 use Lacodix\LaravelPlans\Events\SubscriptionRenewed;
 use Lacodix\LaravelPlans\Models\Traits\ConsumesFeatures;
+use Lacodix\LaravelPlans\Models\Traits\SortableMoveTo;
 use LogicException;
+use Spatie\EloquentSortable\Sortable;
 
 /**
  * @property int $plan_id
  * @property Subscriber $subscriber
+ * @property int $subscriber_id
+ * @property string $subscriber_type
  * @property string $slug
  * @property ?Carbon $started_at
  * @property ?Carbon $trial_ends_at
@@ -30,10 +34,15 @@ use LogicException;
  * @property ?Carbon $canceled_at
  * @property Plan $plan
  */
-class Subscription extends Model
+class Subscription extends Model implements Sortable
 {
     use SoftDeletes;
     use ConsumesFeatures;
+    use SortableMoveTo;
+
+    public array $sortable = [
+        'order_column_name' => 'order',
+    ];
 
     protected $fillable = [
         'plan_id',
@@ -58,6 +67,16 @@ class Subscription extends Model
         'canceled_at' => 'datetime',
         'billed_until' => 'datetime',
     ];
+
+    /**
+     * @return Builder<Subscription>
+     */
+    public function buildSortQuery(): Builder
+    {
+        return static::query()
+            ->where('subscriber_type', $this->subscriber_type)
+            ->where('subscriber_id', $this->subscriber_id);
+    }
 
     public function getTable(): string
     {

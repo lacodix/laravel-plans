@@ -81,6 +81,7 @@ return [
         NunoMaduro\PhpInsights\Domain\Sniffs\ForbiddenSetterSniff::class,
         SlevomatCodingStandard\Sniffs\Classes\ForbiddenPublicPropertySniff::class,
         NunoMaduro\PhpInsights\Domain\Insights\ForbiddenDefineFunctions::class,
+        PHP_CodeSniffer\Standards\Generic\Sniffs\CodeAnalysis\EmptyStatementSniff::class,
     ],
 
     'config' => [
