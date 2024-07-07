@@ -32,8 +32,6 @@ class Feature extends Model
         'slug',
         'name',
         'description',
-        'resettable_period',
-        'resettable_interval',
     ];
 
     public function getTable(): string

@@ -17,6 +17,7 @@ return new class() extends Migration {
             $table->foreignIdFor(config('plans.models.plan'))->constrained();
             $table->morphs('subscriber');
             $table->string('slug'); // only unique per subscriber
+            $table->unsignedSmallInteger('order')->default(0);
             $table->dateTime('started_at')->nullable();
             $table->dateTime('trial_ends_at')->nullable();
             $table->dateTime('period_starts_at')->nullable();
