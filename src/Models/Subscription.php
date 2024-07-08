@@ -194,7 +194,7 @@ class Subscription extends Model implements Sortable
     public function getUncountableFeatures(): array
     {
         return $this->getSluggedFeatures()
-            ->filter(static fn (?int $value) => is_null($value))
+            ->filter(static fn (?int $value) => $value === -2)
             ->keys()
             ->toArray();
     }
@@ -202,7 +202,7 @@ class Subscription extends Model implements Sortable
     public function getCountableFeatures(): array
     {
         return $this->getSluggedFeatures()
-            ->filter(static fn (?int $value) => ! is_null($value))
+            ->filter(static fn (?int $value) => $value >= -1)
             ->toArray();
     }
 
@@ -296,13 +296,13 @@ class Subscription extends Model implements Sortable
     }
 
     /**
-     * @return Collection<string, ?int>
+     * @return Collection<string, int>
      */
     protected function getSluggedFeatures(): Collection
     {
         return $this->plan
             ->features
-            ->mapWithKeys(static fn (Feature $feature) => [$feature->slug => $feature->pivot->value]);
+            ->mapWithKeys(fn (Feature $feature) => [$feature->slug => $this->remaining($feature->slug)]);
     }
 
     protected function setNewPeriod(?Interval $billingInterval = null, ?int $billingPeriod = null, ?Carbon $start = null): static

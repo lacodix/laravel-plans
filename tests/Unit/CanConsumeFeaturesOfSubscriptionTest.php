@@ -35,7 +35,7 @@ it('can consume uncountable feature', function () {
 
     $this->sub->consume('my_feature');
 
-    expect($this->sub->remaining('my_feature'))->toBe(-1);
+    expect($this->sub->remaining('my_feature'))->toBe(-2);
 
     $this->assertDatabaseHas('feature_usages', [
         'subscription_id' => $this->sub->id,
