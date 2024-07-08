@@ -26,6 +26,8 @@ return new class() extends Migration {
             $table->dateTime('canceled_at')->nullable();
             $table->dateTime('billed_until')->nullable();
 
+            $table->json('meta')->nullable();
+
             $table->timestamps();
             $table->softDeletes();
         });
