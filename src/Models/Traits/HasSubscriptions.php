@@ -4,6 +4,7 @@ namespace Lacodix\LaravelPlans\Models\Traits;
 
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Collection;
+use Lacodix\LaravelPlans\Events\PlanSubscribed;
 use Lacodix\LaravelPlans\Exceptions\FeatureNotAvailable;
 use Lacodix\LaravelPlans\Models\Plan;
 use Lacodix\LaravelPlans\Models\Subscription;
@@ -52,6 +53,8 @@ trait HasSubscriptions
         if ($order !== null) {
             $newSubscription->moveTo($order);
         }
+
+        PlanSubscribed::dispatch($newSubscription, $subscription);
 
         return $newSubscription;
     }
