@@ -1,5 +1,8 @@
 <?php
 
+use Illuminate\Support\Facades\Event;
+use Lacodix\LaravelPlans\Events\SubscriptionRenewed;
+use Lacodix\LaravelPlans\Events\SubscriptionsRenewed;
 use Lacodix\LaravelPlans\Models\Plan;
 use function Spatie\PestPluginTestTime\testTime;
 use Tests\Models\User;
@@ -31,6 +34,8 @@ beforeEach(function () {
 });
 
 it('renews only ended and uncancelled subscriptions', function () {
+    Event::fake();
+
     testTime()->freeze('2020-02-01 00:00:00');
     $this->artisan('plans:renew-subscriptions');
 
@@ -40,9 +45,13 @@ it('renews only ended and uncancelled subscriptions', function () {
         ->and($this->sub3->refresh())->period_ends_at->toBeCarbon('2020-02-29 23:59:59')
         ->and($this->sub4->refresh())->period_ends_at->toBeCarbon('2020-02-29 23:59:59')
             ->canceled_for->toBeCarbon('2020-02-29 23:59:59');
+
+    Event::assertDispatched(SubscriptionRenewed::class, 1);
 });
 
 it('renews all uncancelled subscriptions', function () {
+    Event::fake();
+
     testTime()->freeze('2020-02-01 00:00:00');
     $this->artisan('plans:renew-subscriptions --force');
 
@@ -52,4 +61,18 @@ it('renews all uncancelled subscriptions', function () {
         ->and($this->sub3->refresh())->period_ends_at->toBeCarbon('2020-04-30 23:59:59')
         ->and($this->sub4->refresh())->period_ends_at->toBeCarbon('2020-02-29 23:59:59')
         ->canceled_for->toBeCarbon('2020-02-29 23:59:59');
+
+    Event::assertDispatched(SubscriptionRenewed::class, 2);
+    Event::assertNotDispatched(SubscriptionsRenewed::class);
+});
+
+it('it combines subscriptions', function () {
+    Event::fake();
+    config()->set('plans.aggregate_renewals', true);
+
+    testTime()->freeze('2020-02-01 00:00:00');
+    $this->artisan('plans:renew-subscriptions --force');
+
+    Event::assertDispatched(fn (SubscriptionsRenewed $event) => $event->subscriptions->count() === 2);
+    Event::assertDispatched(SubscriptionsRenewed::class, 1);
 });

@@ -161,19 +161,23 @@ class Subscription extends Model implements Sortable
         $this->delete();
     }
 
-    public function renew(bool $force = false): static
+    /**
+     * @return false|Collection<int,FeatureUsage>
+     */
+    public function renew(bool $force = false): false|Collection
     {
         if ($this->ended() && $this->canceled()) {
             throw new LogicException('Unable to renew canceled subscriptions.');
         }
 
         if (! $this->ended() && ! $force) {
-            return $this;
+            return false;
         }
 
         DB::beginTransaction();
 
-        // Clear current usage
+        // Save and clear current usage
+        $usages = $this->usages;
         $this->usages()->delete();
 
         // renew to next period
@@ -184,9 +188,10 @@ class Subscription extends Model implements Sortable
 
         DB::commit();
 
+        // Usages are reset in database, but still in this object
         SubscriptionRenewed::dispatch($this);
 
-        return $this;
+        return $usages;
     }
 
     public function getFeatures(): array

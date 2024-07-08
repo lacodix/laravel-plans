@@ -156,6 +156,8 @@ it('fulfill monthly and onetime token usecase', function () {
 
     // next month renews monthly tokens, but keeps onetime tokens
     testTime()->freeze('2020-02-01 00:00:00');
+    expect($this->sub1->renew())->first()->used->toBe(100)
+        ->and($this->sub2->renew())->toBe(false);
 
     expect($this->user)
         ->canConsumeFeature('second_feature')->toBeTrue()
@@ -178,6 +180,8 @@ it('fulfill monthly and onetime token usecase', function () {
 
     // next month renews monthly tokens, but keeps onetime tokens
     testTime()->freeze('2020-03-01 00:00:00');
+    expect($this->sub1->renew())->first()->used->toBe(100)
+        ->and($this->sub2->renew())->toBe(false);
 
     expect($this->user)
         ->canConsumeFeature('second_feature')->toBeTrue()
@@ -200,9 +204,15 @@ it('fulfill monthly and onetime token usecase', function () {
 
     // next month renews monthly tokens, but keeps onetime tokens
     testTime()->freeze('2020-04-01 00:00:00');
+    expect($this->sub1->renew())->first()->used->toBe(100)
+        ->and($this->sub2->renew())->toBe(false);
 
     expect($this->user)
         ->canConsumeFeature('second_feature')->toBeTrue()
         ->remainingFeature('second_feature')->toBe(100)
         ->consumeFeature('second_feature', 200)->toBeFalse();
+
+    // just to test renewal
+    testTime()->freeze('2021-01-01 00:00:00');
+    expect($this->sub2->renew())->first()->used->toBe(1000);
 });
