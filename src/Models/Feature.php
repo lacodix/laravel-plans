@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Lacodix\LaravelPlans\Enums\Interval;
 use Spatie\Sluggable\SlugOptions;
+use Spatie\Translatable\HasTranslations;
 
 /**
  * Class Feature
@@ -22,6 +23,7 @@ use Spatie\Sluggable\SlugOptions;
 class Feature extends Model
 {
     use HasFactory;
+    use HasTranslations;
 
     public array $translatable = [
         'name',
