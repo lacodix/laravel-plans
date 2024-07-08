@@ -23,7 +23,7 @@ it('sends subscription event', function () {
 
     $sub = $this->user->subscribe($plan);
 
-    Event::assertDispatched(fn(PlanSubscribed $event) => $event->subscription->id === $sub->id && !$event->oldSubscription instanceof \Lacodix\LaravelPlans\Models\Subscription);
+    Event::assertDispatched(fn (PlanSubscribed $event) => $event->subscription->id === $sub->id && !$event->oldSubscription instanceof \Lacodix\LaravelPlans\Models\Subscription);
 });
 
 it('sends subscription event with old subscription', function () {
@@ -49,7 +49,7 @@ it('sends subscription event with old subscription', function () {
 
     $sub2 = $this->user->subscribe($plan2); // deletes first subscription, creates new one, no new trial
 
-    Event::assertDispatched(fn(PlanSubscribed $event) => $event->subscription->id === $sub2->id && $event->oldSubscription->id === $sub1->id);
+    Event::assertDispatched(fn (PlanSubscribed $event) => $event->subscription->id === $sub2->id && $event->oldSubscription->id === $sub1->id);
 });
 
 it('sends plan change event on feature add', function () {
@@ -69,7 +69,7 @@ it('sends plan change event on feature add', function () {
 
     $plan1->features()->attach($feature1);
 
-    Event::assertDispatched(fn(PlanChanged $event) => $event->plan->id === $plan1->id);
+    Event::assertDispatched(fn (PlanChanged $event) => $event->plan->id === $plan1->id);
 });
 
 it('sends plan change event on feature update', function () {
@@ -93,7 +93,7 @@ it('sends plan change event on feature update', function () {
         'value' => 5
     ]);
 
-    Event::assertDispatched(fn(PlanChanged $event) => $event->plan->id === $plan1->id);
+    Event::assertDispatched(fn (PlanChanged $event) => $event->plan->id === $plan1->id);
 });
 
 it('sends plan change event on feature removal', function () {
@@ -115,5 +115,5 @@ it('sends plan change event on feature removal', function () {
 
     $plan1->features()->detach($feature1);
 
-    Event::assertDispatched(fn(PlanChanged $event) => $event->plan->id === $plan1->id);
+    Event::assertDispatched(fn (PlanChanged $event) => $event->plan->id === $plan1->id);
 });
