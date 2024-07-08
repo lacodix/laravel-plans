@@ -4,6 +4,8 @@ namespace Lacodix\LaravelPlans\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
+use Lacodix\LaravelPlans\Events\SubscriptionsRenewed;
 use Lacodix\LaravelPlans\Models\Subscription;
 
 class RenewSubscriptions extends Command
@@ -14,13 +16,29 @@ class RenewSubscriptions extends Command
 
     public function handle(): void
     {
+        $force = $this->option('force') ?? false;
+
         $subscriptions = Subscription::query()
             ->uncanceled()
-            ->when(! $this->option('force'), static fn (Builder $query) => $query->ended())
+            ->when(! $force, static fn (Builder $query) => $query->ended())
             ->get();
 
+        if (config('plans.aggregate_renewals')) {
+            $subscriptions
+                ->groupBy(static fn ($item) => $item->subscriber_type . ':' . $item->subscriber_id)
+                ->each(static function (Collection $subscriptions) use ($force): void {
+                    foreach ($subscriptions as $subscription) {
+                        $subscription->renew($force);
+                    }
+
+                    SubscriptionsRenewed::dispatch($subscriptions);
+                });
+
+            return;
+        }
+
         foreach ($subscriptions as $subscription) {
-            $subscription->renew($this->option('force'));
+            $subscription->renew($force);
         }
     }
 }
