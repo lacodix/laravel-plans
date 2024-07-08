@@ -60,7 +60,7 @@ trait HasSubscriptions
     {
         $remaining = $this->remainingFeature($featureSlug);
 
-        return $remaining === -1 || $remaining >= $shallUse;
+        return $remaining < 0 || $remaining >= $shallUse;
     }
 
     public function consumeFeature(string $featureSlug, int $shallUse = 1)
@@ -84,8 +84,8 @@ trait HasSubscriptions
                         return $shallUse;
                     }
 
-                    // Unlimited or enough, consume, and reduce $shallUse to 0
-                    if (($remaining === -1) || ($remaining >= $shallUse)) {
+                    // Unlimited/Uncountable or enough, consume, and reduce $shallUse to 0
+                    if (($remaining < 0) || ($remaining >= $shallUse)) {
                         $subscription->consume($featureSlug, $shallUse);
 
                         return 0;
@@ -108,23 +108,54 @@ trait HasSubscriptions
     {
         return $this->subscriptions
             ->reduce(static function (int $carry, Subscription $subscription) use ($featureSlug) {
-                if ($carry === -1) {
-                    // At least one subscription was unlimited - just keep unlimited
-                    return -1;
+                if ($carry < 0) {
+                    // At least one subscription was unlimited/uncountable - just keep unlimited
+                    return $carry;
                 }
 
                 $ret = 0;
                 try {
                     $ret = $subscription->remaining($featureSlug);
 
-                    if ($ret === -1) {
-                        // At least one subscription is unlimited - switch to unlimited
-                        return -1;
+                    if ($ret < 0) {
+                        // At least one subscription is unlimited/uncountable - switch to unlimited
+                        return $ret;
                     }
                 } catch (LogicException|FeatureNotAvailable) {
                 }
 
                 return $carry + $ret;
             }, 0);
+    }
+
+    public function getFeatures(): array
+    {
+        return $this->getSluggedFeatures()
+            ->toArray();
+    }
+
+    public function getUncountableFeatures(): array
+    {
+        return $this->getSluggedFeatures()
+            ->filter(static fn (?int $value) => $value === -2)
+            ->keys()
+            ->toArray();
+    }
+
+    public function getCountableFeatures(): array
+    {
+        return $this->getSluggedFeatures()
+            ->filter(static fn (?int $value) => $value >= -1)
+            ->toArray();
+    }
+
+    /**
+     * @return Collection<string, int>
+     */
+    public function getSluggedFeatures(): Collection
+    {
+        return $this->subscriptions
+            ->flatMap(static fn (Subscription $subscription) => $subscription->plan->features->map->slug)
+            ->mapWithKeys(fn (string $featureSlug) => [$featureSlug => $this->remainingFeature($featureSlug)]);
     }
 }

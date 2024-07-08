@@ -45,7 +45,7 @@ it('can consume feature available in one subscription', function () {
     $this->plan2->features()->attach($this->feature2);
 
     expect($this->user->consumeFeature('second_feature'))->toBeTrue()
-        ->and($this->user->remainingFeature('second_feature'))->toBe(-1);
+        ->and($this->user->remainingFeature('second_feature'))->toBe(-2);
 });
 
 it('can consume countable feature as long as available', function () {

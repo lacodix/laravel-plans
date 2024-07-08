@@ -24,8 +24,13 @@ trait ConsumesFeatures
     {
         $feature = $this->getFeatureBySlug($featureSlug);
 
-        // unlimited or uncountable
-        if ($feature->pivot->value === null || $feature->pivot->value === -1) {
+        // Uncountable
+        if ($feature->pivot->value === null) {
+            return -2;
+        }
+
+        // Unlimited
+        if ($feature->pivot->value === -1) {
             return -1;
         }
 
@@ -36,7 +41,7 @@ trait ConsumesFeatures
     {
         $remaining = $this->remaining($featureSlug);
 
-        return $remaining >= $used || $remaining === -1;
+        return $remaining >= $used || $remaining < 0;
     }
 
     public function consume(string $featureSlug, int $used = 1): FeatureUsage
