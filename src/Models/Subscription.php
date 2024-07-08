@@ -56,17 +56,22 @@ class Subscription extends Model implements Sortable
         'canceled_for',
         'canceled_at',
         'billed_until',
+        'meta',
     ];
 
-    protected $casts = [
-        'started_at' => 'datetime',
-        'trial_ends_at' => 'datetime',
-        'period_starts_at' => 'datetime',
-        'period_ends_at' => 'datetime',
-        'canceled_for' => 'datetime',
-        'canceled_at' => 'datetime',
-        'billed_until' => 'datetime',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'started_at' => 'datetime',
+            'trial_ends_at' => 'datetime',
+            'period_starts_at' => 'datetime',
+            'period_ends_at' => 'datetime',
+            'canceled_for' => 'datetime',
+            'canceled_at' => 'datetime',
+            'billed_until' => 'datetime',
+            'meta' => 'json',
+        ];
+    }
 
     /**
      * @return Builder<Subscription>

@@ -58,6 +58,7 @@ class Plan extends Model implements Sortable
         'billing_interval',
         'grace_period',
         'grace_interval',
+        'meta',
     ];
 
     public function getTable(): string
@@ -135,6 +136,7 @@ class Plan extends Model implements Sortable
             'trial_interval' => Interval::class,
             'billing_interval' => Interval::class,
             'grace_interval' => Interval::class,
+            'meta' => 'json',
         ];
     }
 

@@ -23,7 +23,7 @@ trait HasSubscriptions
             ->ordered();
     }
 
-    public function subscribe(Plan $plan, $slug = 'default', ?int $order = null): Subscription
+    public function subscribe(Plan $plan, $slug = 'default', ?int $order = null, ?array $meta = null): Subscription
     {
         $subscription = $this->subscriptions()->where('slug', $slug)->first();
 
@@ -46,6 +46,7 @@ trait HasSubscriptions
             'plan_id' => $plan->id,
             'slug' => $slug,
             'trial_ends_at' => $subscription?->trial_ends_at ?? $trialEndsAt,
+            'meta' => $meta,
         ]);
 
         if ($order !== null) {
