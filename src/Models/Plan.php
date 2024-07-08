@@ -143,7 +143,11 @@ class Plan extends Model implements Sortable
     protected static function booted(): void
     {
         static::deleting(static function (Plan $plan): void {
-            $plan->features()->detach();
+            $plan->features()->detach(); // doesn't fire the deleting event on FeaturePlan
+
+            $plan->subscriptions()->each(static function (Subscription $subscription): void {
+                $subscription->cancelAndDelete();
+            });
         });
     }
 }
