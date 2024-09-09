@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Lacodix\LaravelPlans\Database\Factories\PlanFactory;
 use Lacodix\LaravelPlans\Enums\Interval;
 use Spatie\EloquentSortable\Sortable;
 use Spatie\EloquentSortable\SortableTrait;
@@ -31,6 +32,7 @@ use Spatie\Translatable\HasTranslations;
  */
 class Plan extends Model implements Sortable
 {
+    /** @use HasFactory<PlanFactory> */
     use HasFactory;
     use SortableTrait;
     use HasSlug;
@@ -79,6 +81,7 @@ class Plan extends Model implements Sortable
      */
     public function features(): BelongsToMany
     {
+        // @phpstan-ignore-next-line - phpstan doesn't detect the class string behind config
         return $this->belongsToMany(config('plans.models.feature'))
             ->using(FeaturePlan::class)
             ->withPivot('order', 'value', 'resettable_period', 'resettable_interval')
@@ -90,6 +93,7 @@ class Plan extends Model implements Sortable
      */
     public function subscriptions(): HasMany
     {
+        // @phpstan-ignore-next-line - phpstan doesn't detect the class string behind config
         return $this->hasMany(config('plans.models.subscription'));
     }
 

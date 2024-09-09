@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Lacodix\LaravelPlans\Database\Factories\FeatureFactory;
 use Lacodix\LaravelPlans\Enums\Interval;
 use Spatie\Sluggable\SlugOptions;
 use Spatie\Translatable\HasTranslations;
@@ -22,6 +23,7 @@ use Spatie\Translatable\HasTranslations;
  */
 class Feature extends Model
 {
+    /** @use HasFactory<FeatureFactory> */
     use HasFactory;
     use HasTranslations;
 
@@ -54,6 +56,7 @@ class Feature extends Model
      */
     public function plans(): BelongsToMany
     {
+        // @phpstan-ignore-next-line - phpstan doesn't detect the class string behind config
         return $this->belongsToMany(config('plans.models.plan'))
             ->using(FeaturePlan::class)
             ->withPivot('order');
@@ -64,6 +67,7 @@ class Feature extends Model
      */
     public function usages(): HasMany
     {
+        // @phpstan-ignore-next-line - phpstan doesn't detect the class string behind config
         return $this->hasMany(config('plans.models.feature_usage'));
     }
 

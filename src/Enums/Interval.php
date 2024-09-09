@@ -62,7 +62,6 @@ enum Interval: string
     public function getSyncedPeriodStart(Carbon $start): Carbon
     {
         // If we sync the subscriptions, we have to care about the current interval and calculate different endings
-        // @phpstan-ignore-next-line - PHPStan sees CarbonInterface here, but it isn't
         return match ($this) {
             Interval::DAY => $start->clone()
                 ->startOfDay(),

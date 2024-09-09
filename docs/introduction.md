@@ -3,7 +3,7 @@ title: Introduction
 weight: 1
 ---
 
-nothing yet
+This package ...
 
 ## We have badges
 

@@ -1,0 +1,107 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+use Lacodix\LaravelPlans\Enums\Interval;
+
+return new class() extends Migration {
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up(): void
+    {
+        Schema::create(config('plans.tables.plans'), static function (Blueprint $table): void {
+            $table->id();
+            $table->string('slug')->unique();
+            $table->json('name');
+            $table->json('description')->nullable();
+            $table->decimal('price')->default('0.00');
+            $table->boolean('active')->default(true);
+
+            $table->decimal('signup_fee')->default('0.00');
+            $table->unsignedSmallInteger('trial_period')->default(0);
+            $table->string('trial_interval')->default(Interval::DAY);
+            $table->unsignedSmallInteger('billing_period')->default(1);
+            $table->string('billing_interval')->default(Interval::MONTH);
+            $table->unsignedSmallInteger('grace_period')->default(0);
+            $table->string('grace_interval')->default(Interval::DAY);
+
+            $table->json('meta')->nullable();
+
+            $table->unsignedSmallInteger('order')->default(0);
+
+            $table->timestamps();
+            $table->softDeletes();
+        });
+
+        Schema::create(config('plans.tables.features'), static function (Blueprint $table): void {
+            $table->id();
+            $table->string('slug')->unique();
+            $table->json('name');
+            $table->json('description')->nullable();
+
+            $table->timestamps();
+            $table->softDeletes();
+        });
+
+        Schema::create(config('plans.tables.feature_plan'), static function (Blueprint $table): void {
+            $table->id();
+            $table->foreignIdFor(config('plans.models.plan'))->constrained();
+
+            $table->foreignIdFor(config('plans.models.feature'))->constrained();
+
+            $table->unsignedSmallInteger('order')->default(0);
+            $table->integer('value')->nullable();
+            $table->unsignedSmallInteger('resettable_period')->nullable();
+            $table->string('resettable_interval')->nullable();
+            $table->timestamps();
+        });
+
+        Schema::create(config('plans.tables.subscriptions'), static function (Blueprint $table): void {
+            $table->id();
+            $table->foreignIdFor(config('plans.models.plan'))->constrained();
+            $table->morphs('subscriber');
+            $table->string('slug'); // only unique per subscriber
+            $table->unsignedSmallInteger('order')->default(0);
+            $table->dateTime('started_at')->nullable();
+            $table->dateTime('trial_ends_at')->nullable();
+            $table->dateTime('period_starts_at')->nullable();
+            $table->dateTime('period_ends_at')->nullable();
+            $table->dateTime('canceled_for')->nullable();
+            $table->dateTime('canceled_at')->nullable();
+            $table->dateTime('billed_until')->nullable();
+
+            $table->json('meta')->nullable();
+
+            $table->timestamps();
+            $table->softDeletes();
+        });
+
+        Schema::create(config('plans.tables.feature_usages'), static function (Blueprint $table): void {
+            $table->id();
+            $table->foreignIdFor(config('plans.models.subscription'))->constrained();
+            $table->foreignIdFor(config('plans.models.feature'))->constrained();
+            $table->integer('used')->default(0);
+            $table->dateTime('valid_until')->nullable();
+            $table->timestamps();
+            $table->softDeletes();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists(config('plans.tables.feature_usages'));
+        Schema::dropIfExists(config('plans.tables.subscriptions'));
+        Schema::dropIfExists(config('plans.tables.feature_plan'));
+        Schema::dropIfExists(config('plans.tables.features'));
+        Schema::dropIfExists(config('plans.tables.plans'));
+    }
+};
