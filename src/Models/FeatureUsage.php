@@ -34,6 +34,7 @@ class FeatureUsage extends Model
      */
     public function subscription(): BelongsTo
     {
+        // @phpstan-ignore-next-line - phpstan doesn't detect the class string behind config
         return $this->belongsTo(config('plans.models.subscription'));
     }
 
@@ -42,6 +43,7 @@ class FeatureUsage extends Model
      */
     public function feature(): BelongsTo
     {
+        // @phpstan-ignore-next-line - phpstan doesn't detect the class string behind config
         return $this->belongsTo(config('plans.models.feature'));
     }
 

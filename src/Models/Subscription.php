@@ -87,6 +87,7 @@ class Subscription extends Model implements Sortable
      */
     public function usages(): HasMany
     {
+        // @phpstan-ignore-next-line - phpstan doesn't detect the class string behind config
         return $this->hasMany(config('plans.models.feature_usage'));
     }
 
@@ -95,6 +96,7 @@ class Subscription extends Model implements Sortable
      */
     public function plan(): BelongsTo
     {
+        // @phpstan-ignore-next-line - phpstan doesn't detect the class string behind config
         return $this->belongsTo(config('plans.models.plan'));
     }
 
