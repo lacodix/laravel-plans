@@ -20,11 +20,7 @@ class LaravelPlansServiceProvider extends PackageServiceProvider
             ->name('laravel-plans')
             ->hasConfigFile()
             ->hasMigrations([
-                '2024_07_04_000001_create_plans_table',
-                '2024_07_04_000002_create_features_table',
-                '2024_07_04_000003_create_feature_plan_table',
-                '2024_07_04_000004_create_subscriptions_table',
-                '2024_07_04_000005_create_feature_usages_table',
+                'create_laravel_plans_tables',
             ])
             ->hasCommand(RenewSubscriptions::class)
             ->hasInstallCommand(static function (InstallCommand $command): void {
