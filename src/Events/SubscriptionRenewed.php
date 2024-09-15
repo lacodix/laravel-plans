@@ -2,7 +2,6 @@
 
 namespace Lacodix\LaravelPlans\Events;
 
-use Carbon\Carbon;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 use Lacodix\LaravelPlans\Models\Subscription;

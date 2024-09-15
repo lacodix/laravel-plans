@@ -42,15 +42,18 @@ class Plan extends Model implements Sortable
     use HasTranslations;
     use HasCountableAndUncountableFeatures;
 
+    /** @var array<int, string> */
     public array $translatable = [
         'name',
         'description',
     ];
 
+    /** @var array<string, string> */
     public array $sortable = [
         'order_column_name' => 'order',
     ];
 
+    /** @var array<int, string> */
     protected $fillable = [
         'slug',
         'name',
@@ -149,7 +152,7 @@ class Plan extends Model implements Sortable
     public function getSluggedFeatures(): Collection
     {
         return $this->features
-            ->mapWithKeys(fn (Feature $feature) => [$feature->slug => $feature->pivot->value ?? -2]);
+            ->mapWithKeys(static fn (Feature $feature) => [$feature->slug => $feature->pivot->value ?? -2]);
     }
 
     public function activate(bool $active = true): static
@@ -164,6 +167,9 @@ class Plan extends Model implements Sortable
         return $this->activate(false);
     }
 
+    /**
+     * @return array<string, class-string|string>
+     */
     protected function casts(): array
     {
         return [

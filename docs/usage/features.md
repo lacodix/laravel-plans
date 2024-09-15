@@ -98,7 +98,7 @@ While this function will return all countable features, independent if there is 
     $features = $subscriber->remainingFeature('api_access'); // returns -2;
 ```
 
-## Just get the features of one single plan
+## Just get the features of one single plan or single subscription
 
 In case you need to offer detailed information about your plans, you might be interested in the features that are 
 contained. For this use case you can use the same functions on a plan. This will return the features and the maximum
@@ -110,6 +110,16 @@ and access the features relation on a plan.
     $plan->getUncountableFeatures();
     $plan->getCountableFeatures();
 ```
+
+You can also call it directly on a subscription
+
+```php 
+    $subscription->getFeatures();
+    $subscription->getUncountableFeatures();
+    $subscription->getCountableFeatures();
+```
+
+this is just calling the subscription plans functions.
 
 ## Consume features
 

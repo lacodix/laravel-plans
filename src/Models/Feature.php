@@ -27,11 +27,13 @@ class Feature extends Model
     use HasFactory;
     use HasTranslations;
 
+    /** @var array<int, string> */
     public array $translatable = [
         'name',
         'description',
     ];
 
+    /** @var array<int, string> */
     protected $fillable = [
         'slug',
         'name',
@@ -71,6 +73,9 @@ class Feature extends Model
         return $this->hasMany(config('plans.models.feature_usage'));
     }
 
+    /**
+     * @return array<string, class-string|string>
+     */
     protected function casts(): array
     {
         return [

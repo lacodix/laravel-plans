@@ -4,12 +4,18 @@ namespace Lacodix\LaravelPlans\Models\Traits;
 
 trait HasCountableAndUncountableFeatures
 {
+    /**
+     * @return array<string, int>
+     */
     public function getFeatures(): array
     {
         return $this->getSluggedFeatures()
             ->toArray();
     }
 
+    /**
+     * @return array<int, string>
+     */
     public function getUncountableFeatures(): array
     {
         return $this->getSluggedFeatures()
@@ -18,6 +24,9 @@ trait HasCountableAndUncountableFeatures
             ->toArray();
     }
 
+    /**
+     * @return array<string, int>
+     */
     public function getCountableFeatures(): array
     {
         return $this->getSluggedFeatures()

@@ -56,6 +56,9 @@ class FeatureUsage extends Model
         return Carbon::now()->gte($this->valid_until);
     }
 
+    /**
+     * @return array<string, string>
+     */
     protected function casts(): array
     {
         return [
