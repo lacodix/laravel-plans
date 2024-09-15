@@ -3,7 +3,7 @@ title: Subscriptions
 weight: 3
 ---
 
-After your plan was created, you can subscribe users to it. For doing that you need to implement our
+After your plan is created, you can subscribe users to it. For doing that you need to implement our
 HasSubscriptions trait.
 
 ```php 
@@ -85,7 +85,7 @@ Subscriptions will end automatically, and nothing will happen magically. You hav
 an ended subscription if you want to renew it. With that possibility you can also sell one-time-usages like 1000 Tokens
 that are valid for e.g. 1 year. In such a case it doesn't need to be renewed.
 
-You can use the artisan command if you don't want to take care about renewals on your own. See [Renew Subscriptions](renew_subscriptions.md).
+You can use the artisan command if you don't want to take care about renewals on your own. See [Renew Subscriptions](./renew_subscriptions).
 
 ## Subscription data
 

@@ -60,7 +60,7 @@ be the price given by your plan. But on the first month it will calculate the pe
 depending on the real usage of the month. By default prices are calculated with 2 decimals
 but you can change that by configuration.
 
-this function also takes in account possible trial periods - so if a trial ends in the middle
+This function also takes in account possible trial periods - so if a trial ends in the middle
 of the period or even after it, you will receive 0 or a partial price.
 
 ### Calculate on your own

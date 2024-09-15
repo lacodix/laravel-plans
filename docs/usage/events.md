@@ -14,17 +14,20 @@ a new plan is subscribed in it.
 The event contains the subscription and if available the old subscription model
 
 ```php
-public Subscription $subscription,
-public ?Subscription $oldSubscription,
+public Subscription $subscription
+public ?Subscription $oldSubscription
 ```
 
 With the subscription you can access the subscriber and the plan, and you can access all relevant price and meta
 data to get needed information that is needed for billing.
 
+The old subscription is only available if the subscription was already there, identified by the slug (defaults to 'default').
+If it was updated, then $oldSubscription will contain the old data like ->plan and ->meta.
+
 # PlanChanged
 
 This event is fired when a plan is changed, e.g. when you change the price or the name or description. Sometimes you 
-might react on it, maybe recalculations or inform users. It just contains the affected plan
+might react on it, maybe recalculations or inform users. It just contains the affected plan.
 
 ```php 
 public Plan $plan
@@ -36,7 +39,7 @@ This event is fired when a subscription is renewed. It will contain the subscrip
 access the subscriber and the plan and all metadata that might be needed for billing.
 
 ```php 
-public Subscription $subscription,
+public Subscription $subscription
 ```
 
 # SubscriptionsRenewed
@@ -48,6 +51,6 @@ SubscriptionRenewed that is still fired for each subscription).
 This event contains all affected subscriptions of a subscriber.
 
 ```php 
-public Collection $subscriptions,
+public Collection $subscriptions
 ```
 
