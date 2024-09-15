@@ -23,22 +23,23 @@ class RenewSubscriptions extends Command
             ->when(! $force, static fn (Builder $query) => $query->ended())
             ->get();
 
-        if (config('plans.aggregate_renewals')) {
-            $subscriptions
-                ->groupBy(static fn ($item) => $item->subscriber_type . ':' . $item->subscriber_id)
-                ->each(static function (Collection $subscriptions) use ($force): void {
-                    foreach ($subscriptions as $subscription) {
-                        $subscription->renew($force);
-                    }
-
-                    SubscriptionsRenewed::dispatch($subscriptions);
-                });
+        if (! config('plans.aggregate_renewals')) {
+            foreach ($subscriptions as $subscription) {
+                $subscription->renew($force);
+            }
 
             return;
         }
 
-        foreach ($subscriptions as $subscription) {
-            $subscription->renew($force);
-        }
+        // Group subscriptions by subscriber and renew it in blocks
+        $subscriptions
+            ->groupBy(static fn ($item) => $item->subscriber_type . ':' . $item->subscriber_id)
+            ->each(static function (Collection $subscriptions) use ($force): void {
+                foreach ($subscriptions as $subscription) {
+                    $subscription->renew($force);
+                }
+
+                SubscriptionsRenewed::dispatch($subscriptions);
+            });
     }
 }

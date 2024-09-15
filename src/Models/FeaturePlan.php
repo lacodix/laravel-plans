@@ -19,10 +19,12 @@ class FeaturePlan extends Pivot implements Sortable
 {
     use SortableTrait;
 
+    /** @var array<string, string> */
     public array $sortable = [
         'order_column_name' => 'order',
     ];
 
+    /** @var array<int, string> */
     protected $fillable = [
         'value',
         'order',
@@ -51,6 +53,9 @@ class FeaturePlan extends Pivot implements Sortable
         return $this->belongsTo(Feature::class);
     }
 
+    /**
+     * @return array<string, class-string|string>
+     */
     protected function casts(): array
     {
         return [

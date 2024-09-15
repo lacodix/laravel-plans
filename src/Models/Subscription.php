@@ -16,6 +16,7 @@ use Lacodix\LaravelPlans\Contracts\Subscriber;
 use Lacodix\LaravelPlans\Enums\Interval;
 use Lacodix\LaravelPlans\Events\SubscriptionRenewed;
 use Lacodix\LaravelPlans\Models\Traits\ConsumesFeatures;
+use Lacodix\LaravelPlans\Models\Traits\HasCountableAndUncountableFeatures;
 use Lacodix\LaravelPlans\Models\Traits\SortableMoveTo;
 use LogicException;
 use Spatie\EloquentSortable\Sortable;
@@ -39,11 +40,14 @@ class Subscription extends Model implements Sortable
     use SoftDeletes;
     use ConsumesFeatures;
     use SortableMoveTo;
+    use HasCountableAndUncountableFeatures;
 
+    /** @var array<string, string> */
     public array $sortable = [
         'order_column_name' => 'order',
     ];
 
+    /** @var array<int, string> */
     protected $fillable = [
         'plan_id',
         'subscriber_id',
@@ -187,27 +191,6 @@ class Subscription extends Model implements Sortable
         return $usages;
     }
 
-    public function getFeatures(): array
-    {
-        return $this->getSluggedFeatures()
-            ->toArray();
-    }
-
-    public function getUncountableFeatures(): array
-    {
-        return $this->getSluggedFeatures()
-            ->filter(static fn (?int $value) => $value === -2)
-            ->keys()
-            ->toArray();
-    }
-
-    public function getCountableFeatures(): array
-    {
-        return $this->getSluggedFeatures()
-            ->filter(static fn (?int $value) => $value >= -1)
-            ->toArray();
-    }
-
     /**
      * @param Builder<Subscription> $builder
      *
@@ -268,7 +251,25 @@ class Subscription extends Model implements Sortable
         return $builder->whereNull('canceled_at');
     }
 
+    /**
+     * @param Builder<Subscription> $builder
+     *
+     * @return Builder<Subscription>
+     */
+    public function scopeCanceled(Builder $builder): Builder
+    {
+        return $builder->whereNotNull('canceled_at');
+    }
+
     public function calculatePeriodPrice(): float
+    {
+        return round(
+            $this->plan->price * $this->calculatePeriodLengthInPercent() / 100,
+            config('plans.price_precision', 2)
+        );
+    }
+
+    public function calculatePeriodLengthInPercent(): int
     {
         $period = new Period(
             interval: $this->plan->billing_interval,
@@ -277,12 +278,27 @@ class Subscription extends Model implements Sortable
             synced: config('plans.sync_subscriptions'),
         );
 
-        return round(
-            $this->plan->price * $period->getLengthInPercent($this->trial_ends_at) / 100,
-            config('plans.price_precision', 2)
-        );
+        return $period->getLengthInPercent($this->trial_ends_at);
     }
 
+    public function setNewPeriod(?Interval $billingInterval = null, ?int $billingPeriod = null, ?Carbon $start = null): static
+    {
+        $period = new Period(
+            interval: $billingInterval ?? $this->plan->billing_interval,
+            count: $billingPeriod ?? $this->plan->billing_period,
+            start: $start ?? now(),
+            synced: config('plans.sync_subscriptions'),
+        );
+
+        $this->period_starts_at = $period->getStartDate();
+        $this->period_ends_at = $period->getEndDate();
+
+        return $this;
+    }
+
+    /**
+     * @return array<string, string>
+     */
     protected function casts(): array
     {
         return [
@@ -302,24 +318,7 @@ class Subscription extends Model implements Sortable
      */
     protected function getSluggedFeatures(): Collection
     {
-        return $this->plan
-            ->features
-            ->mapWithKeys(fn (Feature $feature) => [$feature->slug => $this->remaining($feature->slug)]);
-    }
-
-    protected function setNewPeriod(?Interval $billingInterval = null, ?int $billingPeriod = null, ?Carbon $start = null): static
-    {
-        $period = new Period(
-            interval: $billingInterval ?? $this->plan->billing_interval,
-            count: $billingPeriod ?? $this->plan->billing_period,
-            start: $start ?? now(),
-            synced: config('plans.sync_subscriptions'),
-        );
-
-        $this->period_starts_at = $period->getStartDate();
-        $this->period_ends_at = $period->getEndDate();
-
-        return $this;
+        return $this->plan->getSluggedFeatures();
     }
 
     protected static function booted(): void
