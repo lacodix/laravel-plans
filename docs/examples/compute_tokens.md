@@ -67,8 +67,10 @@ Now we have two plans, one for monthly tokens and one for additional tokens.
     $user->consumeFeature('tokens', $amountOfTokensToConsume);
 ```
 
-From now on, the user will be able to consume 1000 tokens per month, and will get 
-new 1000 tokens every renewal.
+From now on, the user will be able to consume 1000 tokens per month, and will get refilled the 
+1000 tokens every renewal. Unused tokens will not be aggregated. If you wish to also keep unused
+tokens, you have to care about that in your renewal solution. You cannot use the existing artisan
+command in that case - but you could extend it.
 
 ### Subscribe to the additional plan
 
@@ -77,15 +79,18 @@ plan. Keep in mind that all subscriptions are renewed automatically. So if you
 want to simulate a one time buy, just subscribe and cancel immediately after.
 
 ```php
-    $subscription = $user->subscribe($additionalTokens);
+    $subscription = $user->subscribe($additionalTokens, uniqid());
     $subscription->cancel();
     
     // Continue consuming
     $user->consumeFeature('tokens', $amountOfTokensToConsume);
 ```
 
-This will ensure, that the additional plan is not renewed. Since the ordering of the plans
-happens automatically (second subscription is second in the list), it is ensured, that always
+The second parameter of subscribe is needed to not overwrite the base-subscription with a new plan.
+Since onetime buys never shall be overwritten, you can simply use uniqid().
+
+The immediate cancellation will ensure, that the additional plan is not renewed. Since the ordering of
+the plans happens automatically (second subscription is second in the list), it is ensured, that always
 the monthly tokens will be used first, when available.
 
 If you have an additional buy first, and then a monthly buy, you have to ensure that your monthly
@@ -93,6 +98,10 @@ plan is first in order.
 
 ```php
     $user->subscribe($monthlyPlan, order: 1);
+    
+    // or
+    $subscription = $user->subscribe($monthlyPlan);
+    $subscription->moveToStart();
 ```
 
 ### Unlimited time

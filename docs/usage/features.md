@@ -69,7 +69,7 @@ be aggregated. If one plan for example contains an unlimited amount, the remaini
 If you are just interested in the availability you can just check for != 0.
 
 -2 and -1 are only of interest for internal uses, and for differ between uncountable and countable but unlimited featuers.
-This is indeed used inside the following function that just returns the slugs of all uncuntable features:
+This is indeed used inside the following function that just returns the slugs of all uncountable features:
 
 ```php 
     $features = $subscriber->getUncountableFeatures();
@@ -111,14 +111,6 @@ and access the features relation on a plan.
     $plan->getCountableFeatures();
 ```
 
-You can also call it directly on a subscription
-
-```php 
-    $subscription->getFeatures();
-    $subscription->getUncountableFeatures();
-    $subscription->getCountableFeatures();
-```
-
 this is just calling the subscription plans functions.
 
 ## Consume features
@@ -155,3 +147,23 @@ All functions above are on the point of view of the subscriber, who might have m
 same feature. If you are interested in the detailed information of one single subscription - maybe to see, how much 
 of the tokens are used in each subscription, you can access this information also.
 
+You can also call the following functions (same as for the subscriber, but dedicated to one single subscription).
+
+```php 
+    $subscription->getFeatures();
+    $subscription->getUncountableFeatures();
+    $subscription->getCountableFeatures();
+```
+
+You can even call the consume function on the subscription, if you want to have control
+over which amounts are used.
+
+```php 
+    $subscription->canConsume('tokens');
+    $subscription->consume('tokens', $amount);
+    $subscription->consumed('tokens'); // returns how much was consumed since last refill
+    $subscription->remaining('tokens');
+    
+    $subscription->unconsume('tokens', $amount); // maybe to undo a previous consumption
+    $subscription->setUsage('tokens', $amount); // sets the usage manually - for reset use 0.
+```
