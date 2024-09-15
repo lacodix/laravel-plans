@@ -268,7 +268,25 @@ class Subscription extends Model implements Sortable
         return $builder->whereNull('canceled_at');
     }
 
+    /**
+     * @param Builder<Subscription> $builder
+     *
+     * @return Builder<Subscription>
+     */
+    public function scopeCanceled(Builder $builder): Builder
+    {
+        return $builder->whereNotNull('canceled_at');
+    }
+
     public function calculatePeriodPrice(): float
+    {
+        return round(
+            $this->plan->price * $this->calculatePeriodLengthInPercent() / 100,
+            config('plans.price_precision', 2)
+        );
+    }
+
+    public function calculatePeriodLengthInPercent(): int
     {
         $period = new Period(
             interval: $this->plan->billing_interval,
@@ -277,10 +295,7 @@ class Subscription extends Model implements Sortable
             synced: config('plans.sync_subscriptions'),
         );
 
-        return round(
-            $this->plan->price * $period->getLengthInPercent($this->trial_ends_at) / 100,
-            config('plans.price_precision', 2)
-        );
+        return $period->getLengthInPercent($this->trial_ends_at);
     }
 
     protected function casts(): array
@@ -307,7 +322,7 @@ class Subscription extends Model implements Sortable
             ->mapWithKeys(fn (Feature $feature) => [$feature->slug => $this->remaining($feature->slug)]);
     }
 
-    protected function setNewPeriod(?Interval $billingInterval = null, ?int $billingPeriod = null, ?Carbon $start = null): static
+    public function setNewPeriod(?Interval $billingInterval = null, ?int $billingPeriod = null, ?Carbon $start = null): static
     {
         $period = new Period(
             interval: $billingInterval ?? $this->plan->billing_interval,

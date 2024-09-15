@@ -2,13 +2,16 @@
 
 namespace Lacodix\LaravelPlans\Models;
 
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Collection;
 use Lacodix\LaravelPlans\Database\Factories\PlanFactory;
 use Lacodix\LaravelPlans\Enums\Interval;
+use Lacodix\LaravelPlans\Models\Traits\HasCountableAndUncountableFeatures;
 use Spatie\EloquentSortable\Sortable;
 use Spatie\EloquentSortable\SortableTrait;
 use Spatie\Sluggable\HasSlug;
@@ -28,7 +31,7 @@ use Spatie\Translatable\HasTranslations;
  * @property Interval $billing_interval
  * @property int $grace_period
  * @property Interval $grace_interval
- * @property Collection<int,Feature> $features
+ * @property EloquentCollection<int,Feature> $features
  */
 class Plan extends Model implements Sortable
 {
@@ -37,6 +40,7 @@ class Plan extends Model implements Sortable
     use SortableTrait;
     use HasSlug;
     use HasTranslations;
+    use HasCountableAndUncountableFeatures;
 
     public array $translatable = [
         'name',
@@ -74,6 +78,26 @@ class Plan extends Model implements Sortable
             ->doNotGenerateSlugsOnUpdate()
             ->generateSlugsFrom('name')
             ->saveSlugsTo('slug');
+    }
+
+    /**
+     * @param Builder<Plan> $query
+     *
+     * @return Builder<Plan>
+     */
+    public function scopeActive(Builder $query): Builder
+    {
+        return $query->where('active', 1);
+    }
+
+    /**
+     * @param Builder<Plan> $query
+     *
+     * @return Builder<Plan>
+     */
+    public function scopeInactive(Builder $query): Builder
+    {
+        return $query->where('active', 0);
     }
 
     /**
@@ -117,6 +141,15 @@ class Plan extends Model implements Sortable
         return $this->features()
             ->where('slug', $slug)
             ->first();
+    }
+
+    /**
+     * @return Collection<string, int>
+     */
+    public function getSluggedFeatures(): Collection
+    {
+        return $this->features
+            ->mapWithKeys(fn (Feature $feature) => [$feature->slug => $feature->pivot->value ?? -2]);
     }
 
     public function activate(bool $active = true): static

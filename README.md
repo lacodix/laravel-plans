@@ -5,8 +5,6 @@
 [![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/lacodix/laravel-plans/style.yaml?branch=master&label=code%20style&style=flat-square)](https://github.com/lacodix/laravel-plans/actions?query=workflow%3Astyle+branch%3Amaster)
 [![Total Downloads](https://img.shields.io/packagist/dt/lacodix/laravel-plans.svg?style=flat-square)](https://packagist.org/packages/lacodix/laravel-plans)
 
-**!! This package is currently in development and not ready for usage !!** 
-
 ## Documentation
 
 You can find the entire documentation for this package on [our documentation site](https://www.lacodix.de/docs/laravel-plans). Including several usecases
@@ -58,7 +56,7 @@ Add our HasSubscription Trait to any model.
 use Lacodix\LaravelPlans\Models\Traits\HasSubscriptions;
 
 class User extends Authenticatable {
-    use HasSubscription;
+    use HasSubscriptions;
     
     ...
 }
