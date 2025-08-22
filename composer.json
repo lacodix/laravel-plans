@@ -37,7 +37,6 @@
         "larastan/larastan": "^2.9",
         "laravel/pint": "^1.0",
         "nunomaduro/collision": "^7.0|^8.0",
-        "nunomaduro/phpinsights": "^2.6",
         "orchestra/testbench": "^9.0|^10.0",
         "pestphp/pest": "^2.21|^3.0",
         "pestphp/pest-plugin-faker": "^2.0|^3.0",
@@ -67,7 +66,6 @@
         "csfixer:test": "php-cs-fixer fix -v",
         "phpstan:test": "php -d memory_limit=-1 vendor/bin/phpstan analyse --ansi",
         "rector:test": "rector process --ansi",
-        "insights": "phpinsights analyse --ansi -v --no-interaction"
     },
     "config": {
         "sort-packages": true,
