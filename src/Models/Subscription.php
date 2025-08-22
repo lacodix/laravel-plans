@@ -69,7 +69,10 @@ class Subscription extends Model implements Sortable
      */
     public function buildSortQuery(): Builder
     {
-        return static::query()
+        /** @var Builder<Subscription> $query */
+        $query = self::query();
+
+        return $query
             ->where('subscriber_type', $this->subscriber_type)
             ->where('subscriber_id', $this->subscriber_id);
     }
@@ -84,11 +87,14 @@ class Subscription extends Model implements Sortable
      */
     public function subscriber(): MorphTo
     {
-        return $this->morphTo();
+        /** @var MorphTo<Model, Subscription> $relation */
+        $relation = $this->morphTo();
+        
+        return $relation;
     }
 
     /**
-     * @return HasMany<FeatureUsage>
+     * @return HasMany<FeatureUsage, Subscription>
      */
     public function usages(): HasMany
     {

@@ -38,7 +38,7 @@ class FeaturePlan extends Pivot implements Sortable
     }
 
     /**
-     * @return BelongsTo<Plan, FeaturePlan>
+     * @return BelongsTo<Plan, $this>
      */
     public function plan(): BelongsTo
     {
@@ -46,7 +46,7 @@ class FeaturePlan extends Pivot implements Sortable
     }
 
     /**
-     * @return BelongsTo<Feature, FeaturePlan>
+     * @return BelongsTo<Feature, $this>
      */
     public function feature(): BelongsTo
     {

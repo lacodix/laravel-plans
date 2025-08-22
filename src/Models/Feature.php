@@ -54,7 +54,7 @@ class Feature extends Model
     }
 
     /**
-     * @return BelongsToMany<Plan>
+     * @return BelongsToMany<Plan, $this>
      */
     public function plans(): BelongsToMany
     {
@@ -65,7 +65,7 @@ class Feature extends Model
     }
 
     /**
-     * @return HasMany<FeatureUsage>
+     * @return HasMany<FeatureUsage, $this>
      */
     public function usages(): HasMany
     {

@@ -1,11 +1,11 @@
 # IDE & System
 /.idea
-/*.iml
 /.vscode
 .phpstorm.meta.php
 .phpunit.result.cache
 .DS_Store
 Thumbs.db
+*.iml
 
 # Project
 /node_modules

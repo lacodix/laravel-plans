@@ -92,6 +92,7 @@ trait ConsumesFeatures
         $usage = $feature->usages()->firstOrNew([
             'subscription_id' => $this->getKey(),
         ]);
+        /** @var FeatureUsage $usage */
 
         if ($feature->pivot->resettable_period) {
             // if not already set, find current valid_until date

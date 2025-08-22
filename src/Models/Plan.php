@@ -104,7 +104,7 @@ class Plan extends Model implements Sortable
     }
 
     /**
-     * @return BelongsToMany<Feature>
+     * @return BelongsToMany<Feature, $this>
      */
     public function features(): BelongsToMany
     {
@@ -116,7 +116,7 @@ class Plan extends Model implements Sortable
     }
 
     /**
-     * @return HasMany<Subscription>
+     * @return HasMany<Subscription, $this>
      */
     public function subscriptions(): HasMany
     {
@@ -141,9 +141,12 @@ class Plan extends Model implements Sortable
 
     public function getFeatureBySlug(string $slug): ?Feature
     {
-        return $this->features()
+        /** @var Feature|null $feature */
+        $feature = $this->features()
             ->where('slug', $slug)
             ->first();
+
+        return $feature;
     }
 
     /**
@@ -188,7 +191,8 @@ class Plan extends Model implements Sortable
         static::deleting(static function (Plan $plan): void {
             $plan->features()->detach(); // doesn't fire the deleting event on FeaturePlan
 
-            $plan->subscriptions()->each(static function (Subscription $subscription): void {
+            $plan->subscriptions()->get()->each(static function ($subscription): void {
+                /** @var Subscription $subscription */
                 $subscription->cancelAndDelete();
             });
         });
