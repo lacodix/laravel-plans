@@ -24,7 +24,7 @@ class FeaturePlan extends Pivot implements Sortable
         'order_column_name' => 'order',
     ];
 
-    /** @var array<int, string> */
+    /** @var list<string> */
     protected $fillable = [
         'value',
         'order',

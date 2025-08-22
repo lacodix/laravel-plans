@@ -33,7 +33,7 @@ class Feature extends Model
         'description',
     ];
 
-    /** @var array<int, string> */
+    /** @var list<string> */
     protected $fillable = [
         'slug',
         'name',

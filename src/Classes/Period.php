@@ -7,7 +7,7 @@ use Lacodix\LaravelPlans\Enums\Interval;
 
 class Period
 {
-    private readonly ?Carbon $end;
+    private readonly Carbon $end;
     private ?Carbon $virtualStart = null;
 
     public function __construct(

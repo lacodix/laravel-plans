@@ -6,3 +6,10 @@ parameters:
   tmpDir: build/phpstan
   checkOctaneCompatibility: true
   checkModelProperties: true
+
+  ignoreErrors:
+    -
+      message: '#^Trait Lacodix\\LaravelPlans\\Models\\Traits\\HasSubscriptions is used zero times and is not analysed\.$#'
+      identifier: trait.unused
+      count: 1
+      path: src/Models/Traits/HasSubscriptions.php

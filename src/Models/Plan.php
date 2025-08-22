@@ -53,7 +53,7 @@ class Plan extends Model implements Sortable
         'order_column_name' => 'order',
     ];
 
-    /** @var array<int, string> */
+    /** @var list<string> */
     protected $fillable = [
         'slug',
         'name',

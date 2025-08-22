@@ -48,7 +48,7 @@ class Subscription extends Model implements Sortable
         'order_column_name' => 'order',
     ];
 
-    /** @var array<int, string> */
+    /** @var list<string> */
     protected $fillable = [
         'plan_id',
         'subscriber_id',
@@ -89,7 +89,7 @@ class Subscription extends Model implements Sortable
     {
         /** @var MorphTo<Model, Subscription> $relation */
         $relation = $this->morphTo();
-        
+
         return $relation;
     }
 
