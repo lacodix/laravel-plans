@@ -48,8 +48,5 @@ jobs:
       - name: Rector
         run: composer run rector:test -- --dry-run
 
-      - name: PHPInsight
-        run: composer run insights
-
-      - name: PHPInsight - Summary only
-        run: composer run insights -- --summary
+      - name: Composer Audit
+        run: composer audit
