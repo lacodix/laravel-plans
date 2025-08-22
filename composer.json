@@ -65,7 +65,7 @@
         "format": "vendor/bin/pint",
         "csfixer:test": "php-cs-fixer fix -v",
         "phpstan:test": "php -d memory_limit=-1 vendor/bin/phpstan analyse --ansi",
-        "rector:test": "rector process --ansi",
+        "rector:test": "rector process --ansi"
     },
     "config": {
         "sort-packages": true,
