@@ -43,6 +43,8 @@ $user->subscribe($myPlan3, 'main'); // will replace myPlan1 subscription
 
 // Renew
 $user->subscriptions()->first()->renew();
+// Force Renew, this will take the subscription end date and make it as the starting date of the new period
+$user->subscriptions()->first()->renew(force: true);
 
 // Cancel
 $user->subscriptions()->first()->cancel();
