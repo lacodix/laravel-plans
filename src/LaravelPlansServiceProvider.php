@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Lacodix\LaravelPlans;
 
 use Lacodix\LaravelPlans\Commands\RenewSubscriptions;
