@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Lacodix\LaravelPlans\Contracts;
 
 use Illuminate\Database\Eloquent\Model;
