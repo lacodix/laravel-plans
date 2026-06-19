@@ -34,6 +34,7 @@ use Spatie\EloquentSortable\Sortable;
  * @property ?Carbon $canceled_for
  * @property ?Carbon $canceled_at
  * @property ?Carbon $billed_until
+ * @property array<string, mixed>|null $meta
  * @property Plan $plan
  */
 class Subscription extends Model implements Sortable
