@@ -31,6 +31,7 @@ use Spatie\Translatable\HasTranslations;
  * @property Interval $billing_interval
  * @property int $grace_period
  * @property Interval $grace_interval
+ * @property array<string, mixed>|null $meta
  * @property EloquentCollection<int,Feature> $features
  */
 class Plan extends Model implements Sortable
