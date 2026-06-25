@@ -38,3 +38,22 @@ it('calculates the price correct with trial', function () {
     $sub->renew();
     expect($sub->calculatePeriodPrice())->toBe(50.0);
 });
+
+it('uses a subscription price override over the plan price', function () {
+    // Subscribe at the start of the month so the first period is full (100%).
+    testTime()->freeze('2020-01-01 00:00:00');
+
+    $user = User::factory()->create();
+    $plan = Plan::factory([
+        'billing_period' => 1,
+        'billing_interval' => 'month',
+        'trial_period' => 0,
+        'grace_period' => 0,
+        'price' => 50,
+    ])->create();
+
+    $sub = $user->subscribe($plan, meta: ['price' => 30]);
+
+    // The override price applies instead of the plan price.
+    expect($sub->calculatePeriodPrice())->toBe(30.0);
+});

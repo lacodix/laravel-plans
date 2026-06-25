@@ -162,6 +162,15 @@ class Subscription extends Model implements Sortable
             ?? data_get($this->plan->meta, $key, $default);
     }
 
+    /**
+     * The base price for this subscription. A per-subscription `price` meta
+     * override wins over the plan's own price; otherwise the plan price applies.
+     */
+    public function effectivePrice(): float
+    {
+        return (float) (data_get($this->meta, 'price') ?? $this->plan->price);
+    }
+
     public function canceled(?Carbon $date = null): bool
     {
         $date ??= now();
@@ -288,7 +297,7 @@ class Subscription extends Model implements Sortable
     public function calculatePeriodPrice(): float
     {
         return round(
-            $this->plan->price * $this->calculatePeriodLengthInPercent() / 100,
+            $this->effectivePrice() * $this->calculatePeriodLengthInPercent() / 100,
             config('plans.price_precision', 2)
         );
     }
