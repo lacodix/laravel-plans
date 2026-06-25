@@ -1,9 +1,9 @@
 <?php
 
 use Lacodix\LaravelPlans\Models\Plan;
-use Tests\Models\User;
-
 use function Spatie\PestPluginTestTime\testTime;
+
+use Tests\Models\User;
 
 beforeEach(function () {
     $this->user = User::factory()->create();
