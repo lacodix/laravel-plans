@@ -36,6 +36,34 @@ it('returns the default when neither plan nor subscription define the key', func
     expect($sub->effectiveMeta('missing', 42))->toBe(42);
 });
 
+it('effectivePrice falls back to the plan price without an override', function () {
+    $plan = Plan::factory([
+        'billing_period' => 1,
+        'billing_interval' => 'month',
+        'trial_period' => 0,
+        'grace_period' => 0,
+        'price' => 50,
+    ])->create();
+
+    $sub = $this->user->subscribe($plan);
+
+    expect($sub->effectivePrice())->toBe(50.0);
+});
+
+it('effectivePrice lets the subscription meta override the plan price', function () {
+    $plan = Plan::factory([
+        'billing_period' => 1,
+        'billing_interval' => 'month',
+        'trial_period' => 0,
+        'grace_period' => 0,
+        'price' => 50,
+    ])->create();
+
+    $sub = $this->user->subscribe($plan, meta: ['price' => 30]);
+
+    expect($sub->effectivePrice())->toBe(30.0);
+});
+
 test('isInTrial checks against the period start by default', function () {
     testTime()->freeze('2020-01-01 12:00:00');
 
