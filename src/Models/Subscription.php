@@ -39,10 +39,10 @@ use Spatie\EloquentSortable\Sortable;
  */
 class Subscription extends Model implements Sortable
 {
-    use SoftDeletes;
     use ConsumesFeatures;
-    use SortableMoveTo;
     use HasCountableAndUncountableFeatures;
+    use SoftDeletes;
+    use SortableMoveTo;
 
     /** @var array<string, string> */
     public array $sortable = [
@@ -113,8 +113,7 @@ class Subscription extends Model implements Sortable
     }
 
     /**
-     * @param Builder<Subscription> $builder
-     *
+     * @param  Builder<Subscription>  $builder
      * @return Builder<Subscription>
      */
     public function scopeByPlanId(Builder $builder, int $planId): Builder
@@ -137,6 +136,30 @@ class Subscription extends Model implements Sortable
         $date ??= now();
 
         return $this->trial_ends_at && $date->lt($this->trial_ends_at);
+    }
+
+    /**
+     * Whether the subscription is still in its trial at the given moment.
+     *
+     * Unlike onTrial(), which checks against the current time, this defaults to
+     * the period start, so billing logic can decide whether a whole period falls
+     * into the trial.
+     */
+    public function isInTrial(?Carbon $at = null): bool
+    {
+        $at ??= $this->period_starts_at ?? now();
+
+        return $this->trial_ends_at !== null && $at->lt($this->trial_ends_at);
+    }
+
+    /**
+     * Resolve a meta value, letting the subscription's own meta override the
+     * plan's meta. Returns the given default when neither defines the key.
+     */
+    public function effectiveMeta(string $key, mixed $default = null): mixed
+    {
+        return data_get($this->meta, $key)
+            ?? data_get($this->plan->meta, $key, $default);
     }
 
     public function canceled(?Carbon $date = null): bool
@@ -200,8 +223,7 @@ class Subscription extends Model implements Sortable
     }
 
     /**
-     * @param Builder<Subscription> $builder
-     *
+     * @param  Builder<Subscription>  $builder
      * @return Builder<Subscription>
      */
     public function scopeEndingTrial(Builder $builder, int $dayRange = 3): Builder
@@ -210,8 +232,7 @@ class Subscription extends Model implements Sortable
     }
 
     /**
-     * @param Builder<Subscription> $builder
-     *
+     * @param  Builder<Subscription>  $builder
      * @return Builder<Subscription>
      */
     public function scopeEndedTrial(Builder $builder): Builder
@@ -220,8 +241,7 @@ class Subscription extends Model implements Sortable
     }
 
     /**
-     * @param Builder<Subscription> $builder
-     *
+     * @param  Builder<Subscription>  $builder
      * @return Builder<Subscription>
      */
     public function scopeEnding(Builder $builder, int $dayRange = 3): Builder
@@ -230,8 +250,7 @@ class Subscription extends Model implements Sortable
     }
 
     /**
-     * @param Builder<Subscription> $builder
-     *
+     * @param  Builder<Subscription>  $builder
      * @return Builder<Subscription>
      */
     public function scopeEnded(Builder $builder): Builder
@@ -240,8 +259,7 @@ class Subscription extends Model implements Sortable
     }
 
     /**
-     * @param Builder<Subscription> $builder
-     *
+     * @param  Builder<Subscription>  $builder
      * @return Builder<Subscription>
      */
     public function scopeActive(Builder $builder): Builder
@@ -250,8 +268,7 @@ class Subscription extends Model implements Sortable
     }
 
     /**
-     * @param Builder<Subscription> $builder
-     *
+     * @param  Builder<Subscription>  $builder
      * @return Builder<Subscription>
      */
     public function scopeUncanceled(Builder $builder): Builder
@@ -260,8 +277,7 @@ class Subscription extends Model implements Sortable
     }
 
     /**
-     * @param Builder<Subscription> $builder
-     *
+     * @param  Builder<Subscription>  $builder
      * @return Builder<Subscription>
      */
     public function scopeCanceled(Builder $builder): Builder
